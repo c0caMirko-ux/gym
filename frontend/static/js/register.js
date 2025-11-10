@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
       password: form.password.value
     };
     try {
-      const res = await apiFetch('/auth/register', { method: 'POST', body: JSON.stringify(data) });
+      const res = await apiFetch('/auth/register', { method: 'POST', body: data });
       setToken(res.access_token);
       showToast('Registro exitoso', 'success');
       location.href = '/pages/sessions.html';

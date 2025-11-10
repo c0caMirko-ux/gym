@@ -4,15 +4,25 @@ async function loadHeader() {
     const r = await fetch('/static/components/header.html');
     if (r.ok) {
       const html = await r.text();
-      document.getElementById('header-container').innerHTML = html;
-      // hook logout
+      const container = document.getElementById('header-container');
+      if (container) container.innerHTML = html;
       const logoutBtn = document.getElementById('logout-btn');
-      if (logoutBtn) logoutBtn.addEventListener('click', () => { clearToken(); location.href = '/pages/login.html'; });
+      const token = localStorage.getItem('access_token');
+      if (logoutBtn) {
+        logoutBtn.style.display = token ? 'inline-block' : 'none';
+        logoutBtn.addEventListener('click', () => {
+          clearToken();
+          location.href = '/pages/login.html';
+        });
+      }
     }
-  } catch (e) { /* ignore */ }
+  } catch (e) {
+    // ignore silently
+    console.debug('header load failed', e);
+  }
 }
 
 function showToast(msg, type='info') {
-  // simple alert fallback; puedes mejorar con un toast DOM
+  // Fallback simple
   alert(msg);
 }

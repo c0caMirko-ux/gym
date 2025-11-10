@@ -1,4 +1,3 @@
-
 # app/models.py
 from sqlalchemy import (
     Column, String, Integer, Boolean, DateTime, ForeignKey, Text, Enum as SAEnum, JSON, CheckConstraint, func
@@ -7,7 +6,6 @@ from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy.orm import relationship, declarative_base
 import enum
 import uuid
-from datetime import datetime
 
 Base = declarative_base()
 
@@ -26,9 +24,6 @@ class SessionStatus(str, enum.Enum):
     scheduled = 'scheduled'
     cancelled = 'cancelled'
     completed = 'completed'
-
-def gen_uuid():
-    return str(uuid.uuid4())
 
 class Plan(Base):
     __tablename__ = 'plans'
@@ -91,10 +86,7 @@ class ClassType(Base):
 
 class Session(Base):
     __tablename__ = 'sessions'
-    __table_args__ = (
-        CheckConstraint('end_time > start_time', name='ck_session_times'),
-        {'schema': 'gym'}
-    )
+    __table_args__ = (CheckConstraint('end_time > start_time', name='ck_session_times'), {'schema': 'gym'})
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     class_type_id = Column(UUID(as_uuid=True), ForeignKey('gym.class_types.id'), nullable=False)
     trainer_id = Column(UUID(as_uuid=True), ForeignKey('gym.trainers.id'))
@@ -157,6 +149,7 @@ class TrainerAvailability(Base):
     end_time = Column(DateTime(timezone=True), nullable=False)
     recurring_rule = Column(String)
     created_at = Column(DateTime, server_default=func.now())
+    __table_args__ = {'schema': 'gym'}
 
 class AuditLog(Base):
     __tablename__ = 'audit_logs'

@@ -4,13 +4,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const container = document.getElementById('my-reservations');
   try {
     const rows = await apiFetch('/me/reservations');
-    if (!rows.length) { container.textContent = 'No tienes reservas.'; return; }
+    if (!rows || !rows.length) { container.textContent = 'No tienes reservas.'; return; }
     container.innerHTML = '';
     rows.forEach(r => {
       const el = document.createElement('div');
       el.className = 'reservation';
       el.innerHTML = `
-        <h3>${r.session.class_type_title || 'Clase'}</h3>
+        <h3>${escapeHtml(r.session.class_type_title || 'Clase')}</h3>
         <p>${new Date(r.session.start_time).toLocaleString()} - ${new Date(r.session.end_time).toLocaleString()}</p>
         <p>Estado: ${r.status}</p>
         <button data-id="${r.id}" class="btn cancel-btn">Cancelar</button>
@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       try {
         await apiFetch(`/reservations/${id}/cancel`, { method: 'PATCH' });
         showToast('Reserva cancelada', 'success');
-        // refrescar
         location.reload();
       } catch (err) {
         console.error(err);
@@ -37,3 +36,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     container.textContent = 'Error cargando reservas';
   }
 });
+
+function escapeHtml(unsafe) {
+  if (!unsafe || typeof unsafe !== 'string') return unsafe;
+  return unsafe
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}

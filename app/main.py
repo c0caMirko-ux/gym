@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import select, func
 from .database import get_db, engine
-from .models import Base, User, Session as SessionModel, Reservation, WaitlistEntry, Trainer, ClassType, Location
+from .models import Base, User, Session as SessionModel, Reservation, WaitlistEntry
 from .auth import get_password_hash, create_access_token, verify_password, get_current_user
 from .schemas import RegisterIn, TokenOut, SessionOut, ReserveIn
 from fastapi.security import OAuth2PasswordRequestForm
@@ -14,29 +14,24 @@ from uuid import UUID
 
 app = FastAPI(title="Gym Reservations API")
 
-# ------------------------------
-# Configuración de archivos estáticos
-# ------------------------------
-
 # Base dir (raíz del repo asumiendo que uvicorn se ejecuta desde la raíz)
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
-# Carpeta frontend/static para CSS, JS, imágenes
+# Montar carpeta frontend/static para servir assets públicos (css, js, components, data)
 static_dir = os.path.join(base_dir, "frontend", "static")
-print(f"📁 Static dir path usado: {static_dir}")  # <- Verifica la ruta real
 if os.path.isdir(static_dir):
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
 else:
     print(f"Warning: static dir not found at {static_dir}. Crea frontend/static con tus assets.")
 
-# Carpeta frontend/pages para HTML
+# Montar carpeta frontend/pages para servir las páginas HTML desde /pages
 pages_dir = os.path.join(base_dir, "frontend", "pages")
 if os.path.isdir(pages_dir):
     app.mount("/pages", StaticFiles(directory=pages_dir), name="pages")
 else:
     print(f"Warning: pages dir not found at {pages_dir}. Crea frontend/pages con tus HTML.")
 
-# Página principal UI
+# Servir la página HTML principal (UI)
 @app.get("/ui")
 def ui():
     index_path = os.path.join(base_dir, "frontend", "index.html")
@@ -44,9 +39,8 @@ def ui():
         return FileResponse(index_path)
     return {"detail": "UI index not found. Crea frontend/index.html"}
 
-# ------------------------------
-# Auth & usuarios
-# ------------------------------
+# Dev helper: crear esquema y tablas si no existen (solo dev)
+# Base.metadata.create_all(bind=engine)
 
 @app.post("/auth/register", response_model=TokenOut)
 def register(payload: RegisterIn, db: Session = Depends(get_db)):
@@ -66,21 +60,19 @@ def register(payload: RegisterIn, db: Session = Depends(get_db)):
 
 @app.post("/auth/login", response_model=TokenOut)
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    # OAuth2PasswordRequestForm provides form fields 'username' and 'password'
     user = db.execute(select(User).filter_by(email=form_data.username)).scalar_one_or_none()
     if not user or not verify_password(form_data.password, user.password_hash):
         raise HTTPException(status_code=400, detail="Credenciales incorrectas")
     token = create_access_token({"sub": str(user.id)})
     return {"access_token": token, "token_type": "bearer"}
 
-# ------------------------------
-# Sesiones y reservas
-# ------------------------------
-
 @app.get("/sessions", response_model=list[SessionOut])
 def list_sessions(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
     rows = db.execute(select(SessionModel).offset(skip).limit(limit)).scalars().all()
     return rows
 
+# Obtener una sesión por id (útil para detalle)
 @app.get("/sessions/{session_id}", response_model=SessionOut)
 def get_session(session_id: UUID, db: Session = Depends(get_db)):
     row = db.get(SessionModel, session_id)
@@ -170,7 +162,7 @@ def add_to_waitlist(session_id: UUID, db: Session = Depends(get_db), current_use
     db.commit()
     return {"status": "waitlisted", "position": pos}
 
-# Obtener mis reservas
+# Obtener mis reservas (para la UI)
 @app.get("/me/reservations")
 def my_reservations(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     rows = db.execute(select(Reservation).filter_by(user_id=current_user.id)).scalars().all()
@@ -191,7 +183,6 @@ def my_reservations(db: Session = Depends(get_db), current_user: User = Depends(
         })
     return out
 
-# Root
 @app.get("/")
 def root():
     return {"message": "API del Gym funcionando correctamente"}

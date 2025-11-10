@@ -1,4 +1,3 @@
-
 # app/auth.py
 from datetime import datetime, timedelta
 from typing import Optional
@@ -48,6 +47,6 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise credentials_exception
 
     user = db.get(User, user_id)
-    if not user or not user.is_active:
+    if not user or not getattr(user, "is_active", True):
         raise credentials_exception
     return user
