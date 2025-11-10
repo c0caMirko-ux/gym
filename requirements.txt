@@ -1,0 +1,11 @@
+# requirements.txt
+fastapi
+uvicorn[standard]
+SQLAlchemy>=1.4
+psycopg2-binary
+python-dotenv
+passlib[bcrypt]
+PyJWT
+alembic
+pytest
+httpx

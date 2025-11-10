@@ -1,0 +1,33 @@
+/* frontend/static/css/static/style.css */
+:root{
+  --bg:#f7f8fb;
+  --panel:#ffffff;
+  --muted:#6b7280;
+  --accent:#3b82f6;
+  --mono:ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background:var(--bg);
+  color:#0f1720;
+  padding:12px;
+}
+.container{max-width:1100px;margin:0 auto;padding:0 12px}
+.site-header{background:var(--panel);border-bottom:1px solid #e6e9ef;padding:10px 0;margin-bottom:12px}
+.header-inner{display:flex;align-items:center;justify-content:space-between}
+.brand a{font-weight:700;color:var(--accent);text-decoration:none}
+.nav a{margin-right:12px;color:#0f1720;text-decoration:none}
+.center{max-width:420px;margin:24px auto;padding:16px;background:var(--panel);border-radius:8px;border:1px solid #e6e9ef}
+form label{display:block;margin-bottom:8px}
+input[type="text"],input[type="email"],input[type="password"],textarea{width:100%;padding:8px;border-radius:6px;border:1px solid #d1d5db;margin-top:6px}
+button{background:var(--accent);color:white;padding:8px 12px;border:none;border-radius:6px;cursor:pointer}
+button.btn-link{background:none;color:var(--accent);border:0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card{background:var(--panel);padding:12px;border-radius:8px;border:1px solid #e6e9ef;margin-bottom:8px}
+pre{background:#0b1220;color:#e6eef8;padding:12px;border-radius:6px;font-family:var(--mono);overflow:auto}
+.reservation{background:var(--panel);padding:12px;border-radius:8px;border:1px solid #e6e9ef;margin-bottom:8px}
+@media (max-width:900px){
+  .grid{grid-template-columns:1fr}
+}

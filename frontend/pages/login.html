@@ -1,0 +1,30 @@
+<!-- frontend/pages/login.html -->
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login - Gym</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div id="header-container"></div>
+  <main class="center">
+    <h1>Login</h1>
+    <form id="login-form">
+      <label>Email
+        <input name="username" type="email" required />
+      </label>
+      <label>Password
+        <input name="password" type="password" required />
+      </label>
+      <button type="submit">Entrar</button>
+    </form>
+    <p>¿No tienes cuenta? <a href="/pages/register.html">Regístrate</a></p>
+  </main>
+
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/ui.js"></script>
+  <script src="/static/js/login.js"></script>
+</body>
+</html>
